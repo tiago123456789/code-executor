@@ -1,0 +1,8 @@
+api/.env
+api/node_modules/
+
+builder/.env
+builder/node_modules/
+
+executor/.env
+executor/node_modules/
