@@ -1,0 +1,24 @@
+FROM node:20.11.0-alpine3.19
+
+RUN apk add --no-cache bash sudo && \
+    apk --no-cache add curl && \
+    curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.alpine.sh' | bash && \
+    apk update && sudo apk add infisical
+
+ARG FILENAME
+
+ARG MODULES_TO_INSTALL=""
+
+WORKDIR app/
+
+COPY package.json .
+
+COPY index.js .
+
+COPY codes/$FILENAME .
+
+RUN mv $FILENAME script_to_run.js
+
+RUN npm i $MODULES_TO_INSTALL --no-audit --progress=false
+
+CMD ["node", "index.js", "script_to_run.js"]

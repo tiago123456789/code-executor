@@ -6,3 +6,9 @@ builder/node_modules/
 
 executor/.env
 executor/node_modules/
+
+frontend/.env
+frontend/node_modules/
+
+try-out-script/.env
+try-out-script/node_modules/

@@ -1,10 +1,11 @@
+require("dotenv").config()
 const { execSync } = require("child_process");
 const fs = require('fs')
 const queue = require("./configs/Queue")("build_docker_image")
 const buildDockerImageCompletedQueue = require("./configs/Queue")("build_docker_image_completed")
 
 queue.process(async (job, done) => {
-    let { code, id } = job.data;
+    let { code, id, secret_manager_token } = job.data;
 
     code = Buffer.from(code, "base64").toString("utf-8");
     code = `${code}
@@ -23,11 +24,26 @@ queue.process(async (job, done) => {
 
     modules = modules.join(" ")
 
-    execSync(`
+    let commandToBuild = `
+        cd blueprint && \
+        docker image build \
+        -f Dockerfile \
+        --build-arg FILENAME="${id}.js" --build-arg MODULES_TO_INSTALL="${modules}" \
+        -t tiagorosadacosta123456/code-${id}:latest .
+    `;
+
+    const hasLoadEnvs = secret_manager_token != null
+    if (hasLoadEnvs) {
+        commandToBuild = `
             cd blueprint && \
-            docker image build --build-arg FILENAME="${id}.js" --build-arg MODULES_TO_INSTALL="${modules}" \
-            -t tiagorosadacosta123456/code-${id} .
-        `)
+            docker image build \
+            -f DockerfileWithEnvs \
+            --build-arg FILENAME="${id}.js" --build-arg MODULES_TO_INSTALL="${modules}" \
+            -t tiagorosadacosta123456/code-${id}:latest .
+        `;
+    }
+
+    execSync(commandToBuild)
 
     execSync(`
             docker push tiagorosadacosta123456/code-${id}

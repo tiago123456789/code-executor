@@ -1,13 +1,15 @@
 const clientDB = require("../config/Database");
+const { TYPE_TRIGGER } = require("../utils/type");
 const queue = require("../config/Queue")("scripts_run")
 
 module.exports = async () => {
     console.log("Start process to get scripts needs to run")
     const scripts = await clientDB("scripts")
         .select([
-            "id"
+            "id", "secret_manager_token"
         ])
         .where("enabled", true)
+        .where("trigger", TYPE_TRIGGER.CRON)
         .whereRaw("extract(epoch from (CURRENT_TIMESTAMP - last_execution::timestamp)) >= interval_to_run")
 
 
