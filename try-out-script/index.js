@@ -36,10 +36,10 @@ tryOutCodeQueue.process(async (job) => {
         docker image build \
         -f Dockerfile \
         --build-arg FILENAME="${id}.js" --build-arg MODULES_TO_INSTALL="${modules}" \
-        -t tiagorosadacosta123456/try-out-script-${id}:latest .
+        -t ${process.env.DOCKER_HUB_USERNAME}/try-out-script-${id}:latest .
     `;
     let commandToRunCode = `
-        docker run --rm docker.io/tiagorosadacosta123456/try-out-script-${id} \
+        docker run --rm ${process.env.DOCKER_HUB_USERNAME}/try-out-script-${id} \
         node index.js ./script_to_run.js ${event}
     `;
     if (loadEnvs) {
@@ -48,10 +48,10 @@ tryOutCodeQueue.process(async (job) => {
             docker image build \
             -f DockerfileWithEnvs \
             --build-arg FILENAME="${id}.js" --build-arg MODULES_TO_INSTALL="${modules}" \
-            -t tiagorosadacosta123456/try-out-script-${id}:latest .
+            -t ${process.env.DOCKER_HUB_USERNAME}/try-out-script-${id}:latest .
         `;
         commandToRunCode = `
-            docker run --rm docker.io/tiagorosadacosta123456/try-out-script-${id} \
+            docker run --rm ${process.env.DOCKER_HUB_USERNAME}/try-out-script-${id} \
             infisical run --token="${token}" \
             --env="prod" -- node index.js ./script_to_run.js ${event}
         `;
@@ -73,7 +73,6 @@ tryOutCodeQueue.process(async (job) => {
 
     return {
         result: {
-            message: "Process finished successfully",
             output: outputScript,
             scriptId: id,
             type

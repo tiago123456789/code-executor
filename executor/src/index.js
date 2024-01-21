@@ -1,8 +1,9 @@
 require("dotenv").config()
 const { execSync } = require("child_process");
+const { QUEUE_COLLECT_EXECUTIONS_OUTPUT, QUEUE_SCRIPT_RUN } = require("../../api/src/constants/Queue");
 
-const queue = require("./configs/Queue")("scripts_run")
-const collectExecutionsOutput = require("./configs/Queue")("collect_executions_output");
+const queue = require("./configs/Queue")(QUEUE_SCRIPT_RUN)
+const collectExecutionsOutput = require("./configs/Queue")(QUEUE_COLLECT_EXECUTIONS_OUTPUT);
 
 queue.process(async (job, done) => {
     let { id, secret_manager_token } = job.data;
