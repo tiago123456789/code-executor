@@ -16,6 +16,4 @@ RUN mv $FILENAME script_to_run.js
 
 RUN npm i $MODULES_TO_INSTALL
 
-# CMD ["node", "index.js", "script_to_run.js"]
-
 CMD ["tail", "-f", "/dev/null"]
