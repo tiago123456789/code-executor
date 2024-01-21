@@ -1,11 +1,13 @@
-const queue = require("../config/Queue")("collect_executions_output")
-const clientDB = require("../config/Database")
+const { QUEUE_COLLECT_EXECUTIONS_OUTPUT } = require("../constants/Queue");
+const queue = require("../config/Queue")(QUEUE_COLLECT_EXECUTIONS_OUTPUT)
+const ScriptRepository = require("../repositories/ScriptRepository")
+
+const scriptRepository = new ScriptRepository()
 
 queue.process(async (job, done) => {
     try {
         const { scriptId, output, type } = job.data;
-        await clientDB("executions")
-        .insert({
+        await scriptRepository.saveLogExecution({
             output,
             script_id: scriptId,
             type
@@ -14,6 +16,7 @@ queue.process(async (job, done) => {
         done();
     } catch(error) {
         console.log(error)
+        throw error;
     }
     
 })

@@ -1,33 +1,30 @@
-const clientDB = require("../config/Database");
-const { TYPE_TRIGGER } = require("../utils/type");
-const queue = require("../config/Queue")("scripts_run")
+const { QUEUE_SCRIPT_RUN } = require("../constants/Queue")
+const queue = require("../config/Queue")(QUEUE_SCRIPT_RUN)
+const ScriptRepository = require("../repositories/ScriptRepository")
+
+const scriptRepository = new ScriptRepository()
 
 module.exports = async () => {
     console.log("Start process to get scripts needs to run")
-    const scripts = await clientDB("scripts")
-        .select([
-            "id", "secret_manager_token"
-        ])
-        .where("enabled", true)
-        .where("trigger", TYPE_TRIGGER.CRON)
-        .whereRaw("extract(epoch from (CURRENT_TIMESTAMP - last_execution::timestamp)) >= interval_to_run")
-
+    const scripts = await scriptRepository.getScriptsToExecute();
 
     if (scripts.length == 0) {
         console.log("Finished here because don't have nothing to process")
         return;
     }
 
+    await queue.addBulk(scripts, {
+        attempts: 2,
+        removeOnComplete: true
+    })
+
+    const scriptIds = []
     for (let index = 0; index < scripts.length; index += 1) {
-        await queue.add(scripts[index], {
-            attempts: 2,
-            removeOnComplete: true
-        })
-        await clientDB("scripts")
-            .where("id", scripts[index].id)
-            .update({
-                last_execution: new Date()
-            })
+        scriptIds.push(scripts[index].id)
     }
+
+    await scriptRepository.updateMany(scriptIds, {
+        last_execution: new Date()
+    })
     console.log("Finished process to get scripts needs to run")
 }

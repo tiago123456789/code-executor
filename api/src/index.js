@@ -2,16 +2,21 @@ require("dotenv").config({ path: ".env" })
 const express = require("express");
 const cors = require("cors")
 const app = express();
-const buildDockerImageQueue = require("./config/Queue")("build_docker_image")
-const scriptRunQueue = require("./config/Queue")("scripts_run")
+const yup = require("yup")
+const generateUrlTriggerScript = require("./utils/GenerateUrlTriggerScript")
+const { QUEUE_SCRIPT_RUN, QUEUE_BUILD_DOCKER_IMAGE } = require("./constants/Queue");
+const buildDockerImageQueue = require("./config/Queue")(QUEUE_BUILD_DOCKER_IMAGE)
+const scriptRunQueue = require("./config/Queue")(QUEUE_SCRIPT_RUN)
 const tryOutCodeQueue = require("./config/Queue")("try_out_code")
 
 const { randomUUID } = require("crypto")
-const clientDB = require("./config/Database");
 const { TYPE_TRIGGER } = require("./utils/type");
+const ScriptRepository = require("./repositories/ScriptRepository");
 
 app.use(express.json())
 app.use(cors("*"))
+
+const scriptRepository = new ScriptRepository()
 
 app.post("/try-out-scripts", async (req, res) => {
     try {
@@ -30,24 +35,21 @@ app.post("/try-out-scripts", async (req, res) => {
         const data = await job.finished();
         res.json(data.result);
     } catch(error) {
-        res.status(500).json({ error: "Yout script take more than or equal 5 seconds" })
+        res.status(500).json({ error: error.message })
     }
-
 })
 
 app.get("/scripts", async (req, res) => {
-    const scripts = await clientDB("scripts")
+    const scripts = await scriptRepository.getAll()
     res.json({
         data: scripts,
     })
 })
 
-
 app.get("/scripts/:id/executions", async (req, res) => {
-    const scripts = await clientDB("executions")
-        .where("script_id", req.params.id)
-        .orderBy("id", "desc")
-        .limit(10)
+    const scripts = await scriptRepository.getLast10ExectuionsByScriptId(
+        req.params.id
+    )
     res.json({
         data: scripts,
     })
@@ -57,23 +59,33 @@ app.post("/scripts", async (req, res) => {
     const data = req.body;
     data.last_execution = new Date()
 
-    if (data.intervalToRun < 60) {
-        return res.status(400).json({
-            message: ["The field intervalToRun needs value more than 60."]
+    const scriptSchema = yup.Schema({
+        code: yup.string().required(),
+        trigger: yup.string().oneOf([TYPE_TRIGGER.CRON, TYPE_TRIGGER.HTTP]),
+        token: yup.string().notRequired(),
+        intervalToRun: yup.where("trigger", {
+            is: (value) => value === TYPE_TRIGGER.CRON,
+            then: yup.number().min(60, "The field intervalToRun needs value more than 60."),
+            otherwise: yup.number().notRequired()
         })
+    })
+
+    const errors = scriptSchema.validate(data)
+    if (errors) {
+        return res.status(400).json({ data: errors })
     }
 
-    const scriptCreated = await clientDB("scripts").insert({
+    const scriptCreated = await scriptRepository.create({
         code: Buffer.from(data.code, "base64").toString("utf-8"),
         last_execution: data.last_execution,
         interval_to_run: data.intervalToRun,
         trigger: data.trigger,
         secret_manager_token: data.token
-    }).returning("*")
+    })
 
     await buildDockerImageQueue.add({
         code: data.code,
-        id: scriptCreated[0].id,
+        id: scriptCreated.id,
         secret_manager_token: data.token || null
     }, {
         attempts: 2,
@@ -82,15 +94,14 @@ app.post("/scripts", async (req, res) => {
 
     const isHttpTrigger = data.trigger === TYPE_TRIGGER.HTTP
     if (isHttpTrigger) {
-        const httpUrl = await clientDB("http_urls_trigger_scripts").insert({
-            code_id: scriptCreated[0].id,
+        const httpUrl = await scriptRepository.createHttpUrlTriggerScript({
+            code_id: scriptCreated.id,
             key: randomUUID(),
-        }).returning("*")
+        })
         return res.status(201).json({
-            urlTrigger: `${process.env.URL_TRIGGER_CRONJOB_VIA_HTTP}${httpUrl[0].id}?key=${httpUrl[0].key}`
+            urlTriggerCode: generateUrlTriggerScript.generate(httpUrl)
         })
     }
-
 
     return res.sendStatus(201)
 })
@@ -100,31 +111,23 @@ app.post("/scripts-triggers/:hash", async (req, res) => {
     const params = req.params
     const body = req.body
 
-    let httpTrigger = await clientDB("http_urls_trigger_scripts")
-        .where("id", params.hash)
-        .limit(1)
-
-    httpTrigger = httpTrigger[0];
-
+    let httpTrigger = await scriptRepository.getHttpUrlTriggerById(params.hash)
     if (!httpTrigger) {
-        return res.json({
+        return res.status(400).json({
             message: "Link is invalid!"
         })
     }
 
-    if (httpTrigger && query.key !== httpTrigger.key) {
-        return res.json({
+    const isInvalidKey = httpTrigger && query.key !== httpTrigger.key
+    if (isInvalidKey) {
+        return res.status(400).json({
             message: "Invalid request!"
         })
     }
 
-    let scriptCreated = await clientDB("scripts")
-        .where("id", httpTrigger.code_id)
-        .limit(1)
-
-    scriptCreated = scriptCreated[0]
+    let scriptCreated = await scriptRepository.getScriptById(httpTrigger.code_id)
     if (!scriptCreated.enabled) {
-        return res.json({
+        return res.status(400).json({
             message: "Script is not ready!"
         })
     }
@@ -138,7 +141,7 @@ app.post("/scripts-triggers/:hash", async (req, res) => {
         removeOnComplete: true
     });
 
-    res.sendStatus(200)
+    res.sendStatus(202)
 })
 
 app.listen(3000, () => console.log(`Server is running at http://localhost:3000`))
