@@ -4,15 +4,18 @@ import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
+import ScriptService from "@/services/Script";
+import NotFoundRegister from "@/components/NotFoundRegister";
+
+const scriptService = new ScriptService()
 
 export default function Home() {
     const [scripts, setScripts] = useState([])
 
     const getScripts = async () => {
-        const { data: registers } = await axios.get("http://localhost:3000/scripts")
-        setScripts(registers.data)
+        const data = await scriptService.getAll()
+        setScripts(data)
     }
 
     useEffect(() => {
@@ -22,7 +25,14 @@ export default function Home() {
     return (
         <div className='container'>
             <br />
+            <Link className="btn btn-sm btn-primary mb-2" href={"/"}>
+                Back
+            </Link>
             <div className='row'>
+                <NotFoundRegister
+                    items={scripts}
+                    message="Not found scirpts"
+                />
                 {
                     scripts.map(item => {
                         return (
@@ -56,3 +66,4 @@ export default function Home() {
         </div>
     )
 }
+

@@ -7,7 +7,6 @@ import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism.css';
 import { useState } from 'react';
 import * as uuid from "uuid"
-import axios from 'axios';
 import SensitiveDataAlert from '@/components/SensitiveDataAlert';
 import OutputScript from '@/components/OutputScript';
 import ScriptService from '@/services/Script';
