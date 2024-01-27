@@ -1,23 +1,20 @@
 "use client"
 import NotFoundRegister from '@/components/NotFoundRegister';
+import useScript from '@/hooks/useScript';
 import ScriptService from '@/services/Script';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-const scriptService = new ScriptService()
+import { useEffect } from 'react';
 
 export default function Home() {
     const params = useParams()
-    const [executions, setExecutions] = useState([])
-
-    const getExecutions = async () => {
-        const data = await scriptService.getLast10ExectuionsByScriptId((params.id) as String)
-        setExecutions(data)
-    }
+    const { 
+        getExecutions,
+        executions
+    } = useScript()
 
     useEffect(() => {
-        getExecutions()
+        getExecutions((params.id) as String)
     }, [])
 
     return (
@@ -43,10 +40,7 @@ export default function Home() {
                         </div>
                     )
                 })}
-
             </div>
-
-
         </div>
     )
 }

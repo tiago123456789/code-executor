@@ -4,8 +4,8 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Code executor - List of script',
-  description: 'The list os scripts created',
+  title: 'Code executor - Executions of script',
+  description: 'The last 10 logs the executions of script',
 }
 
 export default function RootLayout({

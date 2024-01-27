@@ -4,19 +4,14 @@ import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
-import { useEffect, useState } from 'react';
-import ScriptService from "@/services/Script";
+import { useEffect } from 'react';
 import NotFoundRegister from "@/components/NotFoundRegister";
-
-const scriptService = new ScriptService()
+import useScript from "@/hooks/useScript";
 
 export default function Home() {
-    const [scripts, setScripts] = useState([])
-
-    const getScripts = async () => {
-        const data = await scriptService.getAll()
-        setScripts(data)
-    }
+    const { 
+        getScripts, scripts,
+    } = useScript()
 
     useEffect(() => {
         getScripts()

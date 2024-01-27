@@ -5,7 +5,8 @@ import TryOut from "@/models/TryOut"
 class ScriptService {
 
     async create(data: ScriptModel) {
-        return api.post("/scripts", data)
+        const response = await api.post("/scripts", data)
+        return response.data;
     }
 
     async tryOut(data: TryOut) {

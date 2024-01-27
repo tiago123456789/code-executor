@@ -5,28 +5,33 @@ import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism.css';
-import { useState } from 'react';
-import * as uuid from "uuid"
 import SensitiveDataAlert from '@/components/SensitiveDataAlert';
 import OutputScript from '@/components/OutputScript';
 import ScriptService from '@/services/Script';
 import Link from 'next/link';
+import useScript from '@/hooks/useScript';
 
-const DEFAULT_CODE = `function start(event, logger) {  }`
 const DEFAULT_CRONJOB = 'CRON'
-const DEFAULT_INTERVAL = "60"
-
-const scriptService = new ScriptService()
 
 export default function Home() {
-  const [interval, setInterval] = useState(DEFAULT_INTERVAL)
-  const [code, setCode] = useState(DEFAULT_CODE);
-  const [trigger, setTrigger] = useState(DEFAULT_CRONJOB);
-  const [output, setOutput] = useState(null)
-  const [sessionId, setSessionId] = useState(uuid.v4())
-  const [isExecuteCode, setIsExecuteCode] = useState(false)
-  const [loadEnvs, setLoadEnvs] = useState('0')
-  const [token, setToken] = useState<string | null>(null)
+  const {
+    urlToTriggerCode,
+    isLoading,
+    tryOutScript,
+    submit,
+    interval,
+    setInterval,
+    code,
+    setCode,
+    trigger,
+    setTrigger,
+    output,
+    isExecuteCode,
+    loadEnvs,
+    setLoadEnvs,
+    token,
+    setToken
+  } = useScript()
 
   const isNeedsToken = () => {
     return (loadEnvs === '1' ? true : false)
@@ -34,39 +39,6 @@ export default function Home() {
 
   const isCronJobTrigger = () => {
     return trigger === DEFAULT_CRONJOB
-  }
-
-  const submit = async (event: { [key: string]: any }) => {
-    event.preventDefault()
-    const data = {
-      code: btoa(code),
-      intervalToRun: interval,
-      trigger,
-      token
-    }
-
-    await scriptService.create(data)
-    setInterval(DEFAULT_INTERVAL)
-    setCode(DEFAULT_CODE)
-    setTrigger(DEFAULT_CRONJOB)
-    setToken(null)
-    setIsExecuteCode(false)
-    setSessionId(uuid.v4())
-    setOutput("")
-  }
-
-  const tryOutScript = async (event: { [key: string]: any }) => {
-    event.preventDefault()
-    setIsExecuteCode(true)
-    const data = await scriptService.tryOut({
-      code: btoa(code),
-      sessionId,
-      loadEnvs: (loadEnvs === '1' ? true : false),
-      token
-    })
-
-    setOutput(data.output)
-    setIsExecuteCode(false)
   }
 
   return (
@@ -142,13 +114,21 @@ export default function Home() {
         }
 
         <br />
-        <button onClick={submit} className='btn btn-primary'>Save</button>&nbsp;
+        <button onClick={submit} className='btn btn-primary'>
+          {(isLoading ? 'Saving...' : 'Save')}
+        </button>&nbsp;
         <button onClick={tryOutScript} className='btn btn-danger'>
           {(isExecuteCode ? 'Executing...' : 'Execute code')}
         </button>
       </form>
       <br />
       <OutputScript output={output} />
+      {urlToTriggerCode != null &&
+        <div style={{ background: "black", color: 'white', padding: "10px" }}>
+          <p> <span style={{ textTransform: "uppercase" }}>Http url to trigger code:</span> {urlToTriggerCode} </p>
+        </div>
+      }
+
     </div>
   )
 }
