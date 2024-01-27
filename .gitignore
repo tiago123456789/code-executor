@@ -4,6 +4,7 @@ api/logs/
 
 builder/.env
 builder/node_modules/
+builder/logs/
 
 executor/.env
 executor/node_modules/

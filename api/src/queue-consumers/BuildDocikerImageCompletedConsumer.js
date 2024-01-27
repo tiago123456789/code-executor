@@ -1,5 +1,6 @@
 const logger = require("../config/Logger")
 const { QUEUE_BUILD_DOCKER_IMAGE_COMPLETED } = require("../constants/Queue");
+const { CONSUMER_EXTRA_DATA } = require("../constants/Logger")
 const queue = require("../config/Queue")(QUEUE_BUILD_DOCKER_IMAGE_COMPLETED)
 const ScriptRepository = require("../repositories/ScriptRepository")
 
