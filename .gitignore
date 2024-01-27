@@ -1,5 +1,6 @@
 api/.env
 api/node_modules/
+api/logs/
 
 builder/.env
 builder/node_modules/

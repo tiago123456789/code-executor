@@ -7,7 +7,6 @@ const filterByLevel = (level) => {
 }
 
 const logger = winston.createLogger({
-    defaultMeta: { service: 'api' },
     transports: [
         new winston.transports.Console({ level: 'info' }),
         new winston.transports.File({
