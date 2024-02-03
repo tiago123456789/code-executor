@@ -15,7 +15,7 @@ const awsOptions = {
 }
 
 const logger = winston.createLogger({
-    defaultMeta: { service: 'builder' },
+    defaultMeta: { service: 'executor' },
     transports: [
         new winston.transports.Console({ level: 'info' }),
         new WinstonCloudWatch({

@@ -14,6 +14,6 @@ exports.up = function (knex) {
  */
 exports.down = function (knex) {
     return knex.schema.table("scripts", (table) => {
-        table.text("secret_manager_token").nullable()
+        table.dropColumn("secret_manager_token");
     })
 };

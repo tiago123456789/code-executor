@@ -2,9 +2,13 @@ require("dotenv").config()
 const { execSync } = require("child_process");
 const queue = require("./configs/Queue")('scripts_run')
 const collectExecutionsOutput = require("./configs/Queue")('collect_executions_output');
+const logger = require("./configs/Logger")
 
 queue.process(async (job, done) => {
     let { id, secret_manager_token } = job.data;
+    logger.info(`Starting process to execute code ${id}`)
+
+    logger.info(`Transform event to base64 to use in code ${id}`)
 
     const eventData = job.data.event || {}
     const event = (
@@ -16,6 +20,8 @@ queue.process(async (job, done) => {
     let outputScript = "";
     let type = "SUCCESS"
     try {
+
+        logger.info(`Executing code ${id}`)
 
         const hasLoadEnvs = secret_manager_token != null;
         let commandToRunCode = `
@@ -33,9 +39,11 @@ queue.process(async (job, done) => {
         const output = execSync(commandToRunCode);
         outputScript = output.toString()
     } catch (error) {
+        logger.error(error.message)
         type = "ERROR"
         output = error.message
     } finally {
+        logger.info(`Send output execution of code ${id}`)
         await collectExecutionsOutput.add({
             output: outputScript,
             scriptId: id,
@@ -46,6 +54,7 @@ queue.process(async (job, done) => {
         })
     }
 
+    logger.info(`Finished process to execute code ${id}`)
     done()
 });
 

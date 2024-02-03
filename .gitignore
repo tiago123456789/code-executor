@@ -15,4 +15,6 @@ frontend/node_modules/
 try-out-script/.env
 try-out-script/node_modules/
 
+infra/terraform/.terraform
+
 help.txt

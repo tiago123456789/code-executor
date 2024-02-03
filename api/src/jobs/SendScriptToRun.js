@@ -19,15 +19,17 @@ module.exports = async () => {
         }
 
         logger.info(`Sending data about scripts needs to execute now to queue`, CRONJOB_EXTRA_DATA)
-        await queue.addBulk(scripts, {
-            attempts: 2,
-            removeOnComplete: true
-        })
 
         const scriptIds = []
         for (let index = 0; index < scripts.length; index += 1) {
             scriptIds.push(scripts[index].id)
+            scripts[index] = { data: scripts[index] }
         }
+
+        await queue.addBulk(scripts, {
+            attempts: 2,
+            removeOnComplete: true
+        })
 
         logger.info(`Updating column last_execution all scripts sended to queue`, CRONJOB_EXTRA_DATA)
         await scriptRepository.updateMany(scriptIds, {

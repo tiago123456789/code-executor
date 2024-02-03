@@ -1,4 +1,6 @@
 const winston = require('winston')
+const WinstonCloudWatch = require('winston-cloudwatch');
+
 
 const filterByLevel = (level) => {
     return winston.format((input) => {
@@ -6,27 +8,42 @@ const filterByLevel = (level) => {
     });
 }
 
+const awsOptions = {
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }    
+}
+
 const logger = winston.createLogger({
     transports: [
         new winston.transports.Console({ level: 'info' }),
-        new winston.transports.File({
-            filename: "error.log", dirname: "logs",
-            level: "error",
-            format: winston.format.combine(
+        new WinstonCloudWatch({
+            level: 'error',
+            logGroupName: process.env.AWS_CLOUDWATCH_LOG_NAME,
+            logStreamName: process.env.AWS_CLOUDWATCH_LOG_STREAM_NAME,
+            awsRegion: process.env.AWS_REGION,
+            jsonMessage: true,
+            awsOptions: awsOptions,
+            messageFormatter: winston.format.combine(
                 filterByLevel("error")(),
                 winston.format.timestamp(),
                 winston.format.json()
             ),
         }),
-        new winston.transports.File({
-            filename: "info.log", dirname: "logs",
-            level: "info",
-            format: winston.format.combine(
+        new WinstonCloudWatch({
+            level: 'info',
+            logGroupName: process.env.AWS_CLOUDWATCH_LOG_NAME,
+            logStreamName: process.env.AWS_CLOUDWATCH_LOG_STREAM_NAME,
+            awsRegion: process.env.AWS_REGION,
+            jsonMessage: true,
+            awsOptions: awsOptions,
+            messageFormatter: winston.format.combine(
                 filterByLevel("info")(),
                 winston.format.timestamp(),
                 winston.format.json()
             ),
-        })
+        }),
     ],
 });
 
