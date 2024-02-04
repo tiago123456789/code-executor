@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: builder
+  name: builder-configmap
+data:
+  AWS_REGION: 'us-east-1'
+  DOCKER_HUB_USERNAME: "tiagorosadacosta123456"
+

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: executor
+  name: executor-deployment
+  labels:
+    app: executor
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: executor
+  template:
+    metadata:
+      labels:
+        app: executor
+    spec:
+      containers:
+      - name: executor
+        image: registry.digitalocean.com/code-executor/code-executor-executor:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: executor-configmap
+        - secretRef:
+            name: executor-secret
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+      volumes:
+      - name: docker-socket
+        hostPath:
+          path: /var/run/docker.sock

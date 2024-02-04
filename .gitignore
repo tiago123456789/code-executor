@@ -16,5 +16,21 @@ try-out-script/.env
 try-out-script/node_modules/
 
 infra/terraform/.terraform
+infra/terraform/cloudwatch/.terraform
+infra/terraform/cloudwatch/terraform.tfstate
+infra/terraform/cloudwatch/terraform.tfstate.backup
+
+infra/terraform/k8s/.terraform
+infra/terraform/k8s/terraform.tfstate
+infra/terraform/k8s/terraform.tfstate.backup
+
+infra/k8s/api/secret.yml
+infra/k8s/builder/secret.yml
+infra/k8s/consumer/secret.yml
+infra/k8s/executor/secret.yml
+infra/k8s/job/secret.yml
+infra/k8s/try-out-script/secret.yml
+infra/k8s/queue/secret.yml
+
 
 help.txt

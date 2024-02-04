@@ -10,6 +10,7 @@ const tryOutCodeQueue = require("./config/Queue")(QUEUE_TRY_OUT_CODE)
 const scriptRunQueue = require("./config/Queue")(QUEUE_SCRIPT_RUN)
 const { randomUUID } = require("crypto")
 const { TYPE_TRIGGER } = require("./utils/type");
+const codeUtil = require("./utils/Code")
 const ScriptRepository = require("./repositories/ScriptRepository");
 
 app.use(express.json())
@@ -21,8 +22,13 @@ app.post("/try-out-scripts", async (req, res) => {
     try {
         const body = req.body;
 
+        const code = Buffer.from(body.code, "base64").toString("utf-8");
+        if (!codeUtil.hasFunctionStart(code)) {
+            return res.status(400).json({ data: ["You need declare funtion call 'start' to continue."] })
+        }
+
         const job = await tryOutCodeQueue.add({
-            code: body.code,
+            code,
             sessionId: body.sessionId,
             loadEnvs: body.loadEnvs,
             token: body.token
@@ -30,10 +36,10 @@ app.post("/try-out-scripts", async (req, res) => {
             attempts: 1,
             removeOnComplete: true,
         });
-    
+
         const data = await job.finished();
         res.json(data.result);
-    } catch(error) {
+    } catch (error) {
         res.status(500).json({ error: error.message })
     }
 })
@@ -67,12 +73,17 @@ app.post("/scripts", async (req, res) => {
 
     try {
         await scriptSchema.validate(data, { abortEarly: true })
-    } catch(error) {
+    } catch (error) {
         return res.status(400).json({ data: error.errors })
     }
 
+    const code = Buffer.from(data.code, "base64").toString("utf-8");
+    if (!codeUtil.hasFunctionStart(code)) {
+        return res.status(400).json({ data: ["You need declare funtion call 'start' to continue."] })
+    }
+
     const scriptCreated = await scriptRepository.create({
-        code: Buffer.from(data.code, "base64").toString("utf-8"),
+        code,
         last_execution: data.last_execution,
         interval_to_run: data.intervalToRun,
         trigger: data.trigger,

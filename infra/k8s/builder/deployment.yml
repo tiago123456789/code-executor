@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: builder
+  name: builder-deployment
+  labels:
+    app: builder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: builder
+  template:
+    metadata:
+      labels:
+        app: builder
+    spec:
+      containers:
+      - name: builder
+        image: registry.digitalocean.com/code-executor/code-executor-builder:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: builder-configmap
+        - secretRef:
+            name: builder-secret
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+      volumes:
+      - name: docker-socket
+        hostPath:
+          path: /var/run/docker.sock

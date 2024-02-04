@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: consumer
+  name: consumer-deployment
+  labels:
+    app: consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+      - name: consumer
+        image: tiagorosadacosta123456/code-executor-api:latest
+        command: ["npm", "run", "consumer:prod"]
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: consumer-configmap
+        - secretRef:
+            name: consumer-secret
+        ports:
+        - containerPort: 3000

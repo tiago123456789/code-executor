@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: queue
+  name: queue-config
+data:
+  redis.conf: |
+    requirepass $(REDIS_PASSWORD)

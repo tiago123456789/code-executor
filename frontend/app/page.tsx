@@ -7,7 +7,6 @@ import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism.css';
 import SensitiveDataAlert from '@/components/SensitiveDataAlert';
 import OutputScript from '@/components/OutputScript';
-import ScriptService from '@/services/Script';
 import Link from 'next/link';
 import useScript from '@/hooks/useScript';
 

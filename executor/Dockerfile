@@ -18,4 +18,4 @@ COPY . .
 
 RUN npm i --omit=dev
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:prod"]

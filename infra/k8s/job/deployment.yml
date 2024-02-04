@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cronjob
+  name: cronjob-deployment
+  labels:
+    app: cronjob
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cronjob
+  template:
+    metadata:
+      labels:
+        app: cronjob
+    spec:
+      containers:
+      - name: cronjob
+        image: tiagorosadacosta123456/code-executor-api:latest
+        command: ["npm", "run", "job:prod"]
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: cronjob-configmap
+        - secretRef:
+            name: cronjob-secret
+        ports:
+        - containerPort: 3000

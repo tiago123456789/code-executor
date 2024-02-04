@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: try-out-script
+  name: try-out-script-configmap
+data:
+  DOCKER_HUB_USERNAME: "tiagorosadacosta123456"
+
