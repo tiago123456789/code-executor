@@ -23,5 +23,6 @@ jobs:
       run: |
         cd api
         docker build -f Dockerfile -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-api:$(echo $GITHUB_SHA | head -c7) .
+        docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-api:$(echo $GITHUB_SHA | head -c7)
 
 
