@@ -7,9 +7,10 @@ on:
   
 jobs:
 
-  runs-on: ubuntu-latest
 
   build-api:
+    runs-on: ubuntu-latest
+    steps:
     - name: Checkout master
       uses: actions/checkout@v2
 
