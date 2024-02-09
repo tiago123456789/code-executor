@@ -1,0 +1,26 @@
+name: "Deploy application in Kubernetes"
+
+on:
+  push:
+    branches:
+      - master
+  
+jobs:
+
+  runs-on: ubuntu-latest
+
+  build-api:
+    - name: Checkout master
+      uses: actions/checkout@v2
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Build api container image
+      run: |
+        cd api
+        docker build Dockerfile -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-api:$(echo $GITHUB_SHA | head -c7) .
+
+

@@ -29,7 +29,7 @@ resource "digitalocean_container_registry" "repository" {
 resource "digitalocean_kubernetes_cluster" "k8s_cluster" {
   name   = "code-executor-k8s"
   region = "nyc3"
-  version = "1.27.9-do.0"
+  version = "1.29.1-do.0"
 
   node_pool {
     name       = "worker-pool"
