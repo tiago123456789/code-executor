@@ -30,22 +30,26 @@ jobs:
     - name: Push backend image to DigitalOcean Container Registry
       run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-api:$(echo $GITHUB_SHA | head -c7)
 
-  # build-builder:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Checkout master
-  #     uses: actions/checkout@v2
+  build-builder:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout master
+      uses: actions/checkout@v2
 
-  #   - name: Install doctl
-  #     uses: digitalocean/action-doctl@v2
-  #     with:
-  #       token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-  #   - name: Build api container image
-  #     run: |
-  #       cd builder
-  #       docker build -f Dockerfile -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-api:$(echo $GITHUB_SHA | head -c7) .
-  #       docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-api:$(echo $GITHUB_SHA | head -c7)
+    - name: Build builder container image
+      run: |
+        cd builder
+        docker build -f Dockerfile --build-arg USERNAME=${{ secrets.USERNAME }} --build-arg PASSWORD=${{ secrets.PASSWORD }} -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-builder:$(echo $GITHUB_SHA | head -c7) .
 
+    - name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 1200
+
+    - name: Push image to DigitalOcean Container Registry
+      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-builder:$(echo $GITHUB_SHA | head -c7)
 
 
