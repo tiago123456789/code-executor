@@ -246,6 +246,45 @@ jobs:
     - name: Push image to DigitalOcean Container Registry
       run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-executor:$(echo $GITHUB_SHA | head -c7)
 
+  deploy-executor:
+    needs: build-builder
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout master
+      uses: actions/checkout@v2
+
+    - name: Create secret file
+      run: |
+        cd infra/k8s/executor
+        cp ${{ github.workspace }}/infra/k8s/executor/secret.example.yml ${{ github.workspace }}/infra/k8s/executor/secret.yml
+
+    - name: Update image of executor to deploy
+      run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE_VERSION>|'${TAG}'|' ${{ github.workspace }}/infra/k8s/executor/deployment.yml
+
+    - name: Set secrets
+      run: |
+        sed -i 's|<REDIS_HOST>|'${{ secrets.REDIS_HOST }}'|' ${{ github.workspace }}/infra/k8s/executor/secret.yml
+        sed -i 's|<REDIS_PORT>|'${{ secrets.REDIS_PORT }}'|' ${{ github.workspace }}/infra/k8s/executor/secret.yml
+        sed -i 's|<REDIS_USERNAME>|'${{ secrets.REDIS_USERNAME }}'|' ${{ github.workspace }}/infra/k8s/executor/secret.yml
+        sed -i 's|<REDIS_PASSWORLD>|'${{ secrets.REDIS_PASSWORLD }}'|' ${{ github.workspace }}/infra/k8s/executor/secret.yml
+        sed -i 's|<AWS_ACCESS_KEY_ID>|'${{ secrets.AWS_ACCESS_KEY_ID }}'|' ${{ github.workspace }}/infra/k8s/executor/secret.yml
+        sed -i 's|<AWS_SECRET_ACCESS_KEY>|'${{ secrets.AWS_SECRET_ACCESS_KEY }}'|' ${{ github.workspace }}/infra/k8s/executor/secret.yml
+        sed -i 's|<AWS_CLOUDWATCH_LOG_NAME>|'${{ secrets.AWS_CLOUDWATCH_LOG_NAME }}'|' ${{ github.workspace }}/infra/k8s/executor/secret.yml
+        sed -i 's|<AWS_CLOUDWATCH_LOG_STREAM_NAME>|'${{ secrets.AWS_CLOUDWATCH_LOG_STREAM_NAME }}'|' ${{ github.workspace }}/infra/k8s/executor/secret.yml
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Save DigitalOcean kubeconfig with short-lived credentials
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.CLUSTER_NAME }}
+
+    - name: Deploy to DigitalOcean Kubernetes
+      run: | 
+        rm -f ${{ github.workspace }}/infra/k8s/executor/secret.example.yml
+        kubectl apply -f ${{ github.workspace }}/infra/k8s/executor
+
 
   build-try-out-script:
     runs-on: ubuntu-latest
