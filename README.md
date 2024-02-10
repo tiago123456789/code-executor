@@ -48,6 +48,19 @@ The project is final result the solution i created to do same.
 
 ![architecture](./architecture.drawio.png)
 
+### Flow try out script
+
+- 1º step: access frontend app.
+- 2º step: send request to try out script to api.
+- 3º step: send data to queue.
+- 4º step: get message, build docker container, execute code and return output.
+- 5º step: api get output returned and return response for frontend.
+
+
+### Flow execute code in interval
+
+### Flow execute code via http request
+
 ## DATABASE
 
 ![database](./Database.drawio.png)
