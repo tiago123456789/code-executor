@@ -74,6 +74,50 @@ jobs:
         rm -f ${{ github.workspace }}/infra/k8s/api/secret.example.yml
         kubectl apply -f ${{ github.workspace }}/infra/k8s/api
 
+  deploy-consumer:
+    needs: build-api
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout master
+      uses: actions/checkout@v2
+
+    - name: Create secret file
+      run: |
+        cd infra/k8s/consumer
+        cp ${{ github.workspace }}/infra/k8s/consumer/secret.example.yml ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+
+    - name: Update image of api to deploy
+      run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE_VERSION>|'${TAG}'|' ${{ github.workspace }}/infra/k8s/consumer/deployment.yml
+
+    - name: Set secrets
+      run: |
+        sed -i 's|<DB_HOST>|'${{ secrets.DB_HOST }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<DB_PORT>|'${{ secrets.DB_PORT }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<DB_USER>|'${{ secrets.DB_USER }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<DB_PASSWORD>|'${{ secrets.DB_PASSWORD }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<DB_DATABASE>|'${{ secrets.DB_DATABASE }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<REDIS_HOST>|'${{ secrets.REDIS_HOST }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<REDIS_PORT>|'${{ secrets.REDIS_PORT }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<REDIS_USERNAME>|'${{ secrets.REDIS_USERNAME }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<REDIS_PASSWORLD>|'${{ secrets.REDIS_PASSWORLD }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<AWS_ACCESS_KEY_ID>|'${{ secrets.AWS_ACCESS_KEY_ID }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<AWS_SECRET_ACCESS_KEY>|'${{ secrets.AWS_SECRET_ACCESS_KEY }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<AWS_CLOUDWATCH_LOG_NAME>|'${{ secrets.AWS_CLOUDWATCH_LOG_NAME }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+        sed -i 's|<AWS_CLOUDWATCH_LOG_STREAM_NAME>|'${{ secrets.AWS_CLOUDWATCH_LOG_STREAM_NAME }}'|' ${{ github.workspace }}/infra/k8s/consumer/secret.yml
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Save DigitalOcean kubeconfig with short-lived credentials
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.CLUSTER_NAME }}
+
+    - name: Deploy to DigitalOcean Kubernetes
+      run: | 
+        rm -f ${{ github.workspace }}/infra/k8s/consumer/secret.example.yml
+        kubectl apply -f ${{ github.workspace }}/infra/k8s/consumer
+
   build-builder:
     runs-on: ubuntu-latest
     steps:
@@ -96,7 +140,7 @@ jobs:
     - name: Push image to DigitalOcean Container Registry
       run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-builder:$(echo $GITHUB_SHA | head -c7)
 
-  build-exeuctor:
+  build-executor:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout master
