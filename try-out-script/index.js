@@ -9,7 +9,7 @@ tryOutCodeQueue.process(async (job) => {
 
     const eventData = job.data.event || {}
     let [finalCode, event] = await Promise.all([
-        Promise.resolve(new Buffer(code, "base64").toString('ascii')),
+        Promise.resolve(Buffer.from(code, "base64").toString("utf-8")),
         Promise.resolve(Buffer.from(
             JSON.stringify(eventData)
         ).toString("base64"))
@@ -30,11 +30,6 @@ tryOutCodeQueue.process(async (job) => {
     )
 
     modules = modules.join(" ")
-
-    console.log(code)
-    console.log(finalCode)
-    console.log(event)
-    console.log(modules)
 
     let commandToBuild = `
         cd blueprint && \
@@ -62,21 +57,19 @@ tryOutCodeQueue.process(async (job) => {
         `;
     }
 
-    // execSync(commandToBuild)
+    execSync(commandToBuild)
 
     fs.rmSync(`./blueprint/codes/${id}.js`)
 
-    console.log(commandToBuild)
-    console.log(commandToRunCode)
     let outputScript = "";
     let type = "SUCCESS"
-    // try {
-    //     const output = execSync(commandToRunCode);
-    //     outputScript = output.toString()
-    // } catch (error) {
-    //     type = "ERROR"
-    //     outputScript = error.message.replace(commandToRunCode, "")
-    // }
+    try {
+        const output = execSync(commandToRunCode);
+        outputScript = output.toString()
+    } catch (error) {
+        type = "ERROR"
+        outputScript = error.message.replace(commandToRunCode, "")
+    }
 
     return {
         result: {
