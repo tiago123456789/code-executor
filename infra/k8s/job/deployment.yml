@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: cronjob
-        image: tiagorosadacosta123456/code-executor-api:latest
+        image: registry.digitalocean.com/code-executor/code-executor-api:<IMAGE_VERSION>
         command: ["npm", "run", "job:prod"]
         imagePullPolicy: Always
         envFrom:
