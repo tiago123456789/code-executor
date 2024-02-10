@@ -28,7 +28,7 @@ app.post("/try-out-scripts", async (req, res) => {
         }
 
         const job = await tryOutCodeQueue.add({
-            code,
+            code: body.code,
             sessionId: body.sessionId,
             loadEnvs: body.loadEnvs,
             token: body.token
