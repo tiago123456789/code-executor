@@ -56,10 +56,35 @@ The project is final result the solution i created to do same.
 - 4º step: get message, build docker container, execute code and return output.
 - 5º step: api get output returned and return response for frontend.
 
-
 ### Flow execute code in interval
 
+- 1º step: access frontend app.
+- 2º step: send request to api.
+- 3º step: create register database.
+- 4º step: send data to queue.
+- 5º step: get data and build docker image with code.
+- 6º step: send logs to cloudwatch.
+- 7º step: send data to queue to notify docker build finished.
+- 8º step: get message.
+- 9º step: send logs to cloudwatch.
+- 10º step: set script is ready to start to execute.
+- 11º step: get all scripts enabled and interval execution more and equal than time setted and publish to queue.
+- 12º step: execute all codes.
+
+
 ### Flow execute code via http request
+
+- 1º step: make request using unique url to trigger the code.
+- 2º step: create register database.
+- 3º step: send data to queue.
+- 4º step: get data and build docker image with code.
+- 5º step: send logs to cloudwatch
+- 6º step: send data to queue to notify docker build finished.
+- 7º step: get message.
+- 8º step: send logs to cloudwatch.
+- 9º step: set script is ready to start to execute.
+- 10º step: if script is ready, send message to queue, executor get message and execute code.
+
 
 ## DATABASE
 
