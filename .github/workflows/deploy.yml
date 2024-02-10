@@ -325,7 +325,7 @@ jobs:
 
     - name: Set secrets
       run: |
-        sed -i 's|<REDIS_HOST>|'${{ secrets.REDIS_HOST }}'|' ${{ github.workspace }}/infra/k8s/exetry-out-scriptcutor/secret.yml
+        sed -i 's|<REDIS_HOST>|'${{ secrets.REDIS_HOST }}'|' ${{ github.workspace }}/infra/k8s/try-out-scriptcutor/secret.yml
         sed -i 's|<REDIS_PORT>|'${{ secrets.REDIS_PORT }}'|' ${{ github.workspace }}/infra/k8s/try-out-script/secret.yml
         sed -i 's|<REDIS_USERNAME>|'${{ secrets.REDIS_USERNAME }}'|' ${{ github.workspace }}/infra/k8s/try-out-script/secret.yml
         sed -i 's|<REDIS_PASSWORLD>|'${{ secrets.REDIS_PASSWORLD }}'|' ${{ github.workspace }}/infra/k8s/try-out-script/secret.yml
