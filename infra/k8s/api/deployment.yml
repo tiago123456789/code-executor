@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: tiagorosadacosta123456/code-executor-api:latest
+        image: tiagorosadacosta123456/code-executor-api:<IMAGE_VERSION>
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
