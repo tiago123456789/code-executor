@@ -247,7 +247,7 @@ jobs:
       run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-executor:$(echo $GITHUB_SHA | head -c7)
 
   deploy-executor:
-    needs: build-builder
+    needs: build-executor
     runs-on: ubuntu-latest
     steps:
     - name: Checkout master
