@@ -69,6 +69,7 @@ jobs:
         sed -i 's|<AWS_SECRET_ACCESS_KEY>|'${{ secrets.AWS_SECRET_ACCESS_KEY }}'|' ${{ github.workspace }}/infra/k8s/api/secret.yml
         sed -i 's|<AWS_CLOUDWATCH_LOG_NAME>|'${{ secrets.AWS_CLOUDWATCH_LOG_NAME }}'|' ${{ github.workspace }}/infra/k8s/api/secret.yml
         sed -i 's|<AWS_CLOUDWATCH_LOG_STREAM_NAME>|'${{ secrets.AWS_CLOUDWATCH_LOG_STREAM_NAME }}'|' ${{ github.workspace }}/infra/k8s/api/secret.yml
+        sed -i 's|<EMAIL>|'${{ secrets.EMAIL }}'|' ${{ github.workspace }}/infra/k8s/api/issuer.yml
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
