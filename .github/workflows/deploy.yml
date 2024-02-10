@@ -5,17 +5,13 @@ on:
     inputs:
       project:
         type: choice
-        description: What is project want to deploy
+        description: What is the project wants to deploy
         options:
         - api
         - builder
         - executor
         - try-out-script
-
-# on:
-#   push:
-#     branches:
-#       - master
+        - queue
   
 jobs:
 
@@ -361,6 +357,7 @@ jobs:
 
   deploy-queue:
     runs-on: ubuntu-latest
+    if: github.event.inputs.project == 'queue'
     steps:
     - name: Checkout master
       uses: actions/checkout@v2
