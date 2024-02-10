@@ -21,13 +21,13 @@ jobs:
     - name: Build api container image
       run: |
         cd api
-        docker build -f Dockerfile -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-api:$(echo $GITHUB_SHA | head -c7) .
+        docker build -f Dockerfile -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-api:$(echo $GITHUB_SHA | head -c7) .
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
 
     - name: Push backend image to DigitalOcean Container Registry
-      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-api:$(echo $GITHUB_SHA | head -c7)
+      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-api:$(echo $GITHUB_SHA | head -c7)
 
 
   deploy-api:
@@ -88,13 +88,13 @@ jobs:
     - name: Build builder container image
       run: |
         cd builder
-        docker build -f Dockerfile --build-arg USERNAME=${{ secrets.USERNAME }} --build-arg PASSWORD=${{ secrets.PASSWORD }} -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-builder:$(echo $GITHUB_SHA | head -c7) .
+        docker build -f Dockerfile --build-arg USERNAME=${{ secrets.USERNAME }} --build-arg PASSWORD=${{ secrets.PASSWORD }} -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-builder:$(echo $GITHUB_SHA | head -c7) .
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
 
     - name: Push image to DigitalOcean Container Registry
-      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-builder:$(echo $GITHUB_SHA | head -c7)
+      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-builder:$(echo $GITHUB_SHA | head -c7)
 
   build-exeuctor:
     runs-on: ubuntu-latest
@@ -110,13 +110,13 @@ jobs:
     - name: Build executor container image
       run: |
         cd executor
-        docker build -f Dockerfile --build-arg USERNAME=${{ secrets.USERNAME }} --build-arg PASSWORD=${{ secrets.PASSWORD }} -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-executor:$(echo $GITHUB_SHA | head -c7) .
+        docker build -f Dockerfile --build-arg USERNAME=${{ secrets.USERNAME }} --build-arg PASSWORD=${{ secrets.PASSWORD }} -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-executor:$(echo $GITHUB_SHA | head -c7) .
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
 
     - name: Push image to DigitalOcean Container Registry
-      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-executor:$(echo $GITHUB_SHA | head -c7)
+      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-executor:$(echo $GITHUB_SHA | head -c7)
 
 
   build-try-out-script:
@@ -133,13 +133,13 @@ jobs:
     - name: Build try-out-script container image
       run: |
         cd executor
-        docker build -f Dockerfile --build-arg USERNAME=${{ secrets.USERNAME }} --build-arg PASSWORD=${{ secrets.PASSWORD }} -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-try-out-script:$(echo $GITHUB_SHA | head -c7) .
+        docker build -f Dockerfile --build-arg USERNAME=${{ secrets.USERNAME }} --build-arg PASSWORD=${{ secrets.PASSWORD }} -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-try-out-script:$(echo $GITHUB_SHA | head -c7) .
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
 
     - name: Push image to DigitalOcean Container Registry
-      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-execute-try-out-script:$(echo $GITHUB_SHA | head -c7)
+      run:  docker push ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-try-out-script:$(echo $GITHUB_SHA | head -c7)
 
 
 
