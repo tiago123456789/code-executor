@@ -351,7 +351,7 @@ jobs:
 
     - name: Create secret file
       run: |
-        cd infra/k8s/try-out-script
+        cd infra/k8s/queue
         cp ${{ github.workspace }}/infra/k8s/queue/secret.example.yml ${{ github.workspace }}/infra/k8s/queue/secret.yml
 
     - name: Set secrets
