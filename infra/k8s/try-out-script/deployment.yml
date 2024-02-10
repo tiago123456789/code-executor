@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: try-out-script
-        image: tiagorosadacosta123456/code-executor-try-out-script:latest
+        image: registry.digitalocean.com/code-executor/code-executor-try-out-script:<IMAGE_VERSION>
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
