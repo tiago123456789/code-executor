@@ -358,10 +358,10 @@ jobs:
       run: |
         sed -i 's|<redis-password>|'${{ secrets.REDIS_PASSWORLD }}'|' ${{ github.workspace }}/infra/k8s/queue/secret.yml
 
-    - name: Deploy to DigitalOcean Kubernetes
-      run: | 
-        rm -f ${{ github.workspace }}/infra/k8s/queue/secret.example.yml
-        kubectl apply -f ${{ github.workspace }}/infra/k8s/queue
+    # - name: Deploy to DigitalOcean Kubernetes
+      # run: | 
+      #   rm -f ${{ github.workspace }}/infra/k8s/queue/secret.example.yml
+      #   kubectl apply -f ${{ github.workspace }}/infra/k8s/queue
 
 
 
