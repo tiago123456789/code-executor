@@ -70,7 +70,9 @@ jobs:
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.CLUSTER_NAME }}
 
     - name: Deploy to DigitalOcean Kubernetes
-      run: kubectl apply -f ${{ github.workspace }}/infra/k8s/api
+      run: | 
+        kubectl create namespace api
+        kubectl apply -f ${{ github.workspace }}/infra/k8s/api
 
   build-builder:
     runs-on: ubuntu-latest
