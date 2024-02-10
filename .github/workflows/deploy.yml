@@ -300,7 +300,7 @@ jobs:
     - name: Build try-out-script container image
       run: |
         cd try-out-script
-        docker build -f Dockerfile --build-arg USERNAME=${{ secrets.USERNAME }} --build-arg PASSWORD=${{ secrets.PASSWORD }} -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-try-out-script:$(echo $GITHUB_SHA | head -c7) .
+        docker build -f Dockerfile -t ${{ secrets.DIGITALOCEAN_DOCKER_REGISTRY }}/code-executor-try-out-script:$(echo $GITHUB_SHA | head -c7) .
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200

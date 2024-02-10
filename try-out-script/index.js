@@ -61,6 +61,8 @@ tryOutCodeQueue.process(async (job) => {
 
     fs.rmSync(`./blueprint/codes/${id}.js`)
 
+    console.log(commandToBuild)
+    console.log(commandToRunCode)
     let outputScript = "";
     let type = "SUCCESS"
     try {
