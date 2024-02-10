@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: builder
-        image: registry.digitalocean.com/code-executor/code-executor-builder:latest
+        image: registry.digitalocean.com/code-executor/code-executor-builder:<IMAGE_VERSION>
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
