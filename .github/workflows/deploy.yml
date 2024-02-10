@@ -1,14 +1,27 @@
 name: "Deploy application in Kubernetes"
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      project:
+        type: choice
+        description: What is project want to deploy
+        options:
+        - api
+        - builder
+        - executor
+        - try-out-script
+
+# on:
+#   push:
+#     branches:
+#       - master
   
 jobs:
 
   build-api:
     runs-on: ubuntu-latest
+    if: github.event.inputs.project == 'api'
     steps:
     - name: Checkout master
       uses: actions/checkout@v2
@@ -163,6 +176,7 @@ jobs:
         kubectl apply -f ${{ github.workspace }}/infra/k8s/job
 
   build-builder:
+    if: github.event.inputs.project == 'builder'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout master
@@ -226,6 +240,7 @@ jobs:
 
   build-executor:
     runs-on: ubuntu-latest
+    if: github.event.inputs.project == 'executor'
     steps:
     - name: Checkout master
       uses: actions/checkout@v2
@@ -287,6 +302,7 @@ jobs:
 
 
   build-try-out-script:
+    if: github.event.inputs.project == 'try-out-script'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout master
