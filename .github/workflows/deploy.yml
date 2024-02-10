@@ -43,7 +43,7 @@ jobs:
         cp ${{ github.workspace }}/infra/k8s/api/secret.example.yml ${{ github.workspace }}/infra/k8s/api/secret.yml
 
     - name: Update image of api to deploy
-      run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE_VERSION>|''${TAG}'|' ${{ github.workspace }}/infra/k8s/api/deployment.yml
+      run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE_VERSION>|'${TAG}'|' ${{ github.workspace }}/infra/k8s/api/deployment.yml
 
     - name: Set secrets
       run: |
