@@ -9,7 +9,7 @@ tryOutCodeQueue.process(async (job) => {
 
     const eventData = job.data.event || {}
     let [finalCode, event] = await Promise.all([
-        Promise.resolve(Buffer.from(code, "base64").toString("utf-8")),
+        Promise.resolve(Buffer.from(code, "base64").toString()),
         Promise.resolve(Buffer.from(
             JSON.stringify(eventData)
         ).toString("base64"))
@@ -32,6 +32,7 @@ tryOutCodeQueue.process(async (job) => {
     modules = modules.join(" ")
 
     console.log(code)
+    console.log(finalCode)
     console.log(event)
     console.log(modules)
 
@@ -61,7 +62,7 @@ tryOutCodeQueue.process(async (job) => {
         `;
     }
 
-    execSync(commandToBuild)
+    // execSync(commandToBuild)
 
     fs.rmSync(`./blueprint/codes/${id}.js`)
 
