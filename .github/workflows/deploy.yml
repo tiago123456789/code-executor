@@ -71,6 +71,7 @@ jobs:
 
     - name: Deploy to DigitalOcean Kubernetes
       run: | 
+        rm -f ${{ github.workspace }}/infra/k8s/api/secret.example.yml
         kubectl create namespace api
         kubectl apply -f ${{ github.workspace }}/infra/k8s/api
 
