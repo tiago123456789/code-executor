@@ -31,6 +31,10 @@ tryOutCodeQueue.process(async (job) => {
 
     modules = modules.join(" ")
 
+    console.log(code)
+    console.log(event)
+    console.log(modules)
+
     let commandToBuild = `
         cd blueprint && \
         docker image build \
