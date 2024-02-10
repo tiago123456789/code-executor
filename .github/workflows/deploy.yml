@@ -344,7 +344,6 @@ jobs:
         kubectl apply -f ${{ github.workspace }}/infra/k8s/try-out-script
 
   deploy-queue:
-    needs: build-try-out-script
     runs-on: ubuntu-latest
     steps:
     - name: Checkout master
@@ -358,14 +357,6 @@ jobs:
     - name: Set secrets
       run: |
         sed -i 's|<redis-password>|'${{ secrets.REDIS_PASSWORLD }}'|' ${{ github.workspace }}/infra/k8s/queue/secret.yml
-
-    - name: Install doctl
-      uses: digitalocean/action-doctl@v2
-      with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-    - name: Save DigitalOcean kubeconfig with short-lived credentials
-      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.CLUSTER_NAME }}
 
     - name: Deploy to DigitalOcean Kubernetes
       run: | 
