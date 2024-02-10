@@ -65,13 +65,13 @@ tryOutCodeQueue.process(async (job) => {
     console.log(commandToRunCode)
     let outputScript = "";
     let type = "SUCCESS"
-    try {
-        const output = execSync(commandToRunCode);
-        outputScript = output.toString()
-    } catch (error) {
-        type = "ERROR"
-        outputScript = error.message.replace(commandToRunCode, "")
-    }
+    // try {
+    //     const output = execSync(commandToRunCode);
+    //     outputScript = output.toString()
+    // } catch (error) {
+    //     type = "ERROR"
+    //     outputScript = error.message.replace(commandToRunCode, "")
+    // }
 
     return {
         result: {
