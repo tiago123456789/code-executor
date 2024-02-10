@@ -9,7 +9,7 @@ tryOutCodeQueue.process(async (job) => {
 
     const eventData = job.data.event || {}
     let [finalCode, event] = await Promise.all([
-        Promise.resolve(Buffer.from(code, "base64").toString()),
+        Promise.resolve(new Buffer(code, "base64").toString('ascii')),
         Promise.resolve(Buffer.from(
             JSON.stringify(eventData)
         ).toString("base64"))
